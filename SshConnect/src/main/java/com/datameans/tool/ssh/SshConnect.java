@@ -8,7 +8,6 @@ import java.util.Properties;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
-import com.mysql.cj.jdbc.exceptions.CommunicationsException;
 
 public class SshConnect {
 
@@ -41,6 +40,7 @@ private String DB_ADDRS = null;
 	      int nRemotePort = 3306;                               // remote port number of your database 
 	       
 	    	   try {
+	    		   System.out.println(sshUser+ sshHost+ sshPort+sshPassword+sshRemoteHost);
 	    		   final JSch jsch = new JSch();
 	    		   Session session = jsch.getSession( sshUser, sshHost, sshPort );
 	    		   session.setPassword( sshPassword );
@@ -50,7 +50,14 @@ private String DB_ADDRS = null;
 	    		   session.setConfig( config );
 				       
 	    		   session.connect();
-	    		   session.setPortForwardingL(nLocalPort, sshRemoteHost, nRemotePort);
+	    		   while(true){
+	    		  try{
+	    			  session.setPortForwardingL(nLocalPort, sshRemoteHost, nRemotePort);
+	    			  break;
+	    		  }catch(com.jcraft.jsch.JSchException e){
+	    			  nLocalPort++;
+	    		  }
+	    		   }
 	    		   if(sshDbPassword==null){
 	    			   sshDbPassword=DB_PASS;	    			   
 	    		   }
@@ -58,8 +65,14 @@ private String DB_ADDRS = null;
 	    			   sshDbUser=DB_USER;
 	    		   }
 
-	    		   conn = DriverManager.getConnection("jdbc:mysql://localhost:"+nLocalPort+"/"+DB_NAME+"?useUnicode=true&characterEncoding=UTF-8&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC", sshDbUser, sshDbPassword);
-	    		 
+//System.out.println(sshDbUser+"!!!"+sshDbPassword+".."+DB_NAME);
+//System.out.println(//					 try {
+//					Class.forName("com.mysql.jdbc.Driver");
+//				} catch (ClassNotFoundException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}"jdbc:mysql://localhost:"+nLocalPort+"/"+DB_NAME);
+	    		   conn = DriverManager.getConnection("jdbc:mysql://localhost:"+nLocalPort+"/"+DB_NAME+"?useUnicode=true&noAccessToProcedureBodies=true&characterEncoding=UTF-8&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC", sshDbUser, sshDbPassword);
 	    	   } catch (JSchException e1) {
 	    		   // TODO Auto-generated catch block
 	    		   e1.printStackTrace();
@@ -82,13 +95,20 @@ private String DB_ADDRS = null;
 				
 				try{
 					DriverManager.setLoginTimeout(20);
+
 					conn = DriverManager.getConnection(
-							"jdbc:mysql://"+DB_HOST+"/"+DB_NAME+"?useUnicode=true&characterEncoding=UTF-8&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC",
+							"jdbc:mysql://"+DB_HOST+"/"+DB_NAME+"?useUnicode=true&characterEncoding=UTF-8&noAccessToProcedureBodies=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC",
 							DB_USER,DB_PASS);
-					return true;
-				}catch(CommunicationsException e){
-					sshConnectToDb();
 					return false;
+				}catch(SQLException e){
+				//	e.printStackTrace();
+					if(sshHost!=null){
+						sshConnectToDb();
+						return true;
+					}else{
+						throw e;
+					}
+					
 				}
 		
 		
@@ -97,6 +117,9 @@ private String DB_ADDRS = null;
 	
 	public Connection getConnection(){
 		return conn;
+	}
+	public void disconnect() throws SQLException{
+		conn.close();
 	}
 
 	public String getSshUser() {
@@ -197,6 +220,10 @@ private String DB_ADDRS = null;
 
 	public SshConnect setDB_ADDRS(String dB_ADDRS) {
 		DB_ADDRS = dB_ADDRS;
+		return this;
+	}
+	public SshConnect setDB_Host(String dB_Host) {
+		this.DB_HOST=dB_Host;
 		return this;
 	}
 

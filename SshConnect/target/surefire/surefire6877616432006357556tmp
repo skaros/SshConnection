@@ -1,0 +1,28 @@
+#surefire
+#Sat Mar 31 20:47:38 EEST 2018
+testClassesDirectory=/home/ilias/git/SshConnection/SshConnect/target/test-classes
+classPathUrl.3=/home/ilias/.m2/repository/mysql/mysql-connector-java/6.0.4/mysql-connector-java-6.0.4.jar
+classPathUrl.2=/home/ilias/.m2/repository/com/jcraft/jsch/0.1.54/jsch-0.1.54.jar
+useManifestOnlyJar=true
+classPathUrl.1=/home/ilias/git/SshConnection/SshConnect/target/classes
+reportsDirectory=/home/ilias/git/SshConnection/SshConnect/target/surefire-reports
+classPathUrl.0=/home/ilias/git/SshConnection/SshConnect/target/test-classes
+dirscanner.0=directoryScannerOptions
+providerConfiguration=org.apache.maven.surefire.junit.JUnit3Provider
+testSuiteDefinitionTestSourceDirectory=/home/ilias/git/SshConnection/SshConnect/src/test/java
+surefireClassPathUrl.1=/home/ilias/.m2/repository/org/apache/maven/surefire/surefire-api/2.7.1/surefire-api-2.7.1.jar
+surefireClassPathUrl.0=/home/ilias/.m2/repository/org/apache/maven/surefire/surefire-junit3/2.7.1/surefire-junit3-2.7.1.jar
+report.2=org.apache.maven.surefire.report.XMLReporter
+useSystemClassLoader=true
+report.1=org.apache.maven.surefire.report.BriefFileReporter
+report.0=org.apache.maven.surefire.report.ForkingConsoleReporter
+excludes0=**/*$*
+isTrimStackTrace=true
+dirscanner.0.params=/home/ilias/git/SshConnection/SshConnect/target/test-classes|[**/Test*.java, **/*Test.java, **/*TestCase.java]|[**/*$*]
+enableAssertions=true
+includes2=**/*TestCase.java
+failIfNoTests=false
+includes1=**/*Test.java
+dirscanner.0.types=java.io.File|java.util.ArrayList|java.util.ArrayList
+includes0=**/Test*.java
+childDelegation=false
