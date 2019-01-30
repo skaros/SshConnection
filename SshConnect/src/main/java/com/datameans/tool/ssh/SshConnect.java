@@ -1,8 +1,10 @@
 package com.datameans.tool.ssh;
+// 6984
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Map;
 import java.util.Properties;
 
 import com.jcraft.jsch.JSch;
@@ -11,7 +13,17 @@ import com.jcraft.jsch.Session;
 
 public class SshConnect {
 
-//	private boolean ssh=false;
+@Override
+	public String toString() {
+		return "SshConnect [sshUser=" + sshUser + ", sshPassword="
+				+ sshPassword + ", sshHost=" + sshHost + ", sshPort=" + sshPort
+				+ ", sshRemoteHost=" + sshRemoteHost + ", sshDbUser="
+				+ sshDbUser + ", sshDbPassword=" + sshDbPassword + ", conn="
+				+ conn + ", DB_ADDRS=" + DB_ADDRS + ", DB_USER=" + DB_USER
+				+ ", DB_PASS=" + DB_PASS + ", DB_HOST=" + DB_HOST
+				+ ", DB_NAME=" + DB_NAME + "]";
+	}
+	//	private boolean ssh=false;
 	/**SSH loging username */
 	private  String sshUser;                // SSH loging username
 	/**SSH login password */
@@ -34,54 +46,71 @@ private String DB_ADDRS = null;
 	private String DB_PASS = null;
 	private String DB_HOST = null;
 	private String DB_NAME ;
-	
-	public SshConnect sshConnectToDb() throws SQLException, JSchException{		
-	      int nLocalPort = 3366;                                // local port number use to bind SSH tunnel
-	      int nRemotePort = 3306;                               // remote port number of your database 
-	       
+	private Session session;
+	 private int nLocalPort=3366; // local port number use to bind SSH tunnel
+
+	 public boolean isSshConnected(){
+		 if(session!=null&&session.isConnected()){
+			 return true;
+		 }else{
+			 return false;
+		 }
+	 }
+	 
+	 public void sshConnect() throws JSchException{
+		 int nRemotePort = 3306;        
+		   final JSch jsch = new JSch();
+		    session = jsch.getSession( sshUser, sshHost, sshPort );
+		   session.setPassword( sshPassword );
+		       
+		   final Properties config = new Properties();
+		   config.put( "StrictHostKeyChecking", "no" );
+		   session.setConfig( config );
+		      
+		   session.connect();
+		   
+		   while(true){
+			   try{
+				   session.setPortForwardingL(nLocalPort, sshRemoteHost, nRemotePort);
+				   break;
+			   }catch(com.jcraft.jsch.JSchException e){
+				   nLocalPort++;
+			   }
+		   }
+	   
+	 }
+	 
+	 public SshConnect sshConnectToDb() throws SQLException, JSchException{		
+	  //    int nLocalPort = 3366;                                // local port number use to bind SSH tunnel
+	   
+		                       // remote port number of your database 
 	    	   try {
-	    		   System.out.println(sshUser+ sshHost+ sshPort+sshPassword+sshRemoteHost);
-	    		   final JSch jsch = new JSch();
-	    		   Session session = jsch.getSession( sshUser, sshHost, sshPort );
-	    		   session.setPassword( sshPassword );
-				       
-	    		   final Properties config = new Properties();
-	    		   config.put( "StrictHostKeyChecking", "no" );
-	    		   session.setConfig( config );
-				       
-	    		   session.connect();
-	    		   while(true){
-	    		  try{
-	    			  session.setPortForwardingL(nLocalPort, sshRemoteHost, nRemotePort);
-	    			  break;
-	    		  }catch(com.jcraft.jsch.JSchException e){
-	    			  nLocalPort++;
-	    		  }
+	    		   if(!isSshConnected()){
+	    			   sshConnect();
 	    		   }
+	    		 //  System.out.println(toString());
 	    		   if(sshDbPassword==null){
 	    			   sshDbPassword=DB_PASS;	    			   
 	    		   }
 	    		   if(sshDbUser==null){
 	    			   sshDbUser=DB_USER;
-	    		   }
-
-//System.out.println(sshDbUser+"!!!"+sshDbPassword+".."+DB_NAME);
-//System.out.println(//					 try {
-//					Class.forName("com.mysql.jdbc.Driver");
-//				} catch (ClassNotFoundException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}"jdbc:mysql://localhost:"+nLocalPort+"/"+DB_NAME);
-	    		   conn = DriverManager.getConnection("jdbc:mysql://localhost:"+nLocalPort+"/"+DB_NAME+"?useUnicode=true&noAccessToProcedureBodies=true&characterEncoding=UTF-8&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC", sshDbUser, sshDbPassword);
+	    		   }// &autoReconnect=true&failOverReadOnly=false&maxReconnects=10
+	    		   
+	    		   conn = DriverManager.getConnection("jdbc:mysql://127.0.0.1:"+nLocalPort+"/"+DB_NAME+"?useUnicode=true&noAccessToProcedureBodies=true&characterEncoding=UTF-8&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC", 
+	    				   sshDbUser, sshDbPassword);
 	    	   } catch (JSchException e1) {
-	    		   // TODO Auto-generated catch block
 	    		   e1.printStackTrace();
+	    		   disconnect();	    		
+	    		   throw e1;
+	    	   }  catch (SQLException e1) {
+	    		   e1.printStackTrace();
+	    		//   disconnect();	    		
 	    		   throw e1;
 	    	   }   
 
 	   		return this;
 	}
-	
+
 	/**
 	 * 
 	 * @return true if it is connected to the simple mysql server. 
@@ -91,27 +120,46 @@ private String DB_ADDRS = null;
 	 */
 	public  boolean connectToDB( )throws SQLException, JSchException{
 		
-		
+//		 StackTraceElement[] elements = Thread.currentThread().getStackTrace();
+//	       for (int i = 1; i < elements.length; i++) {
+//	    	    StackTraceElement s = elements[i];
+//	    	    System.out.println("\tat " + s.getClassName() + "." + s.getMethodName() + "(" + s.getFileName() + ":" + s.getLineNumber() + ")");
+//	    	  }
 				
 				try{
 					DriverManager.setLoginTimeout(20);
+//System.out.println("!1/"+toString());
+
+//System.out.println("jdbc:mysql://"+DB_HOST+"/"+DB_NAME+"?useUnicode=true&characterEncoding=UTF-8&noAccessToProcedureBodies=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC");
 
 					conn = DriverManager.getConnection(
-							"jdbc:mysql://"+DB_HOST+"/"+DB_NAME+"?useUnicode=true&characterEncoding=UTF-8&noAccessToProcedureBodies=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC",
+							"jdbc:mysql://"+DB_HOST+"/"+DB_NAME+"?"
+									+ "useUnicode=true&characterEncoding=UTF-8&"
+									+ "noAccessToProcedureBodies=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true",
 							DB_USER,DB_PASS);
 					return false;
 				}catch(SQLException e){
 				//	e.printStackTrace();
 					if(sshHost!=null){
+						System.out.println("connect via SSH");
 						sshConnectToDb();
 						return true;
 					}else{
-						throw e;
+						return false;
+//						throw e;
+					}					
+				}catch(Exception ee){
+				//	System.out.println("!@3");ee.printStackTrace();
+
+					if(sshHost!=null){
+						sshConnectToDb();
+						return true;
+					}else{
+						return false;
+//						throw e;
 					}
 					
-				}
-		
-		
+				}		
 	}
 	
 	
@@ -119,7 +167,8 @@ private String DB_ADDRS = null;
 		return conn;
 	}
 	public void disconnect() throws SQLException{
-		conn.close();
+		try{conn.close();}catch(Exception e){}
+		try{session.disconnect();}catch(Exception e){}
 	}
 
 	public String getSshUser() {
@@ -160,6 +209,9 @@ private String DB_ADDRS = null;
 
 	public String getDB_NAME() {
 		return DB_NAME;
+	}
+	public int getLocalPort(){
+		return nLocalPort;
 	}
 
 
@@ -226,6 +278,8 @@ private String DB_ADDRS = null;
 		this.DB_HOST=dB_Host;
 		return this;
 	}
+	
+
 
 	
 }

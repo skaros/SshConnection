@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.datameans.tool.ssh</groupId>
   <artifactId>ssh-connect</artifactId>
-  <version>0.0.2-SNAPSHOT</version>
+  <version>1.0.0 Alpha</version>
   <name>ShhConnect</name>
   <description>connection methods to an ssh server</description>
   
@@ -51,7 +51,7 @@
   	<dependency>
   		<groupId>mysql</groupId>
   		<artifactId>mysql-connector-java</artifactId>
-  		<version>6.0.4</version>
+  		<version>5.1.39</version>
   	</dependency>
   </dependencies>
 </project>
