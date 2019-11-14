@@ -144,13 +144,13 @@ private String DB_ADDRS = null;
 						System.out.println("connect via SSH");
 						sshConnectToDb();
 						return true;
-					}else{
+					}else{e.printStackTrace();
 						return false;
 //						throw e;
 					}					
 				}catch(Exception ee){
 				//	System.out.println("!@3");ee.printStackTrace();
-
+System.out.println("\n\n ERROR\n\n");
 					if(sshHost!=null){
 						sshConnectToDb();
 						return true;

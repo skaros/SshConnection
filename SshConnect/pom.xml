@@ -1,17 +1,36 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.datameans.tool.ssh</groupId>
+  <groupId>eu.linkedbusiness.tool.ssh</groupId>
   <artifactId>ssh-connect</artifactId>
-  <version>1.0.0 Alpha</version>
+  <version>1.0.2-RELEASE</version>
   <name>ShhConnect</name>
   <description>connection methods to an ssh server</description>
+  <properties>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+</properties>
   
   
-  
-  <build>
-
-
-		<plugins>
+ 
+<build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-deploy-plugin</artifactId>
+          <version>2.8.2</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+    <distributionManagement>
+    <repository>
+      <id>LB-RELEASE</id>
+      <url>http://34.246.153.7:8081/repository/LB-RELEASE/</url>
+    </repository>
+  </distributionManagement>
+    
+<!-- 		<plugins>
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<configuration>
@@ -26,8 +45,8 @@
 				</configuration>
 				<executions>
 					<execution>
-						<id>make-assembly</id> <!-- this is used for inheritance merges -->
-						<phase>package</phase> <!-- bind to the packaging phase -->
+						<id>make-assembly</id> this is used for inheritance merges 
+						<phase>package</phase>  bind to the packaging phase  
 						<goals>
 							<goal>single</goal>
 						</goals>
@@ -36,9 +55,9 @@
 			</plugin>
 
 
-		</plugins>
-	</build>
-	
+		</plugins> 
+		-->
+ 	
 	
 	
   <dependencies>
