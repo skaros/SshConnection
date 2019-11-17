@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>eu.linkedbusiness.tool.ssh</groupId>
   <artifactId>ssh-connect</artifactId>
-  <version>1.0.2-RELEASE</version>
+  <version>1.0.3-RELEASE</version>
   <name>ShhConnect</name>
   <description>connection methods to an ssh server</description>
   <properties>
@@ -11,8 +11,7 @@
 </properties>
   
   
- 
-<build>
+    <build>
     <pluginManagement>
       <plugins>
         <plugin>
@@ -29,6 +28,7 @@
       <url>http://34.246.153.7:8081/repository/LB-RELEASE/</url>
     </repository>
   </distributionManagement>
+
     
 <!-- 		<plugins>
 			<plugin>
